@@ -6,13 +6,14 @@ import Button from '@mui/material/Button'
 import MenuItem from '@mui/material/MenuItem'
 import Box from '@mui/material/Box'
 import Alert from '@mui/material/Alert'
+import { useAuth } from '../context/AuthContext'
 
 export default function SubmitRequestPage() {
+  const auth = useAuth()
   const [offers, setOffers] = useState([])
   const [loading, setLoading] = useState(true)
   const [message, setMessage] = useState('')
   const [serviceOfferId, setServiceOfferId] = useState('')
-  const [requesterId, setRequesterId] = useState(1)
   const [statusMsg, setStatusMsg] = useState(null)
 
   useEffect(() => {
@@ -30,14 +31,17 @@ export default function SubmitRequestPage() {
     const payload = {
       message,
       status: 'OPEN',
-      requesterId,
+      requesterId: auth.user?.id,
       serviceOfferId: Number(serviceOfferId),
     }
 
     try {
       const res = await fetch('http://localhost:8080/api/requests', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Basic ' + auth.credentials,
+        },
         body: JSON.stringify(payload),
       })
       if (!res.ok) throw new Error('Failed')
@@ -94,17 +98,6 @@ export default function SubmitRequestPage() {
             ))
           )}
         </TextField>
-
-        <TextField
-          label="Requester ID (Dummy)"
-          type="number"
-          value={requesterId}
-          onChange={(e) => setRequesterId(Number(e.target.value))}
-          inputProps={{ min: 1 }}
-          sx={{ mb: 2 }}
-          required
-          fullWidth
-        />
 
         <Button type="submit" variant="contained">
           Absenden

@@ -21,6 +21,9 @@ public class AppUser {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column
+    private String password;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
@@ -50,6 +53,14 @@ public class AppUser {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Role getRole() {

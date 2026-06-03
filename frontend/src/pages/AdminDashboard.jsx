@@ -10,19 +10,25 @@ import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
 import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
+import { useAuth } from '../context/AuthContext'
 
 export default function AdminDashboard() {
+  const auth = useAuth()
   const [requests, setRequests] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let mounted = true
-    fetch('http://localhost:8080/api/requests')
+    fetch('http://localhost:8080/api/requests', {
+      headers: {
+        'Authorization': 'Basic ' + auth.credentials,
+      },
+    })
       .then((r) => r.json())
       .then((d) => mounted && setRequests(d || []))
       .finally(() => mounted && setLoading(false))
     return () => (mounted = false)
-  }, [])
+  }, [auth.credentials])
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>

@@ -52,7 +52,7 @@ export default function OffersPage() {
                     <Typography variant="h6" component="h2">
                       {offer.title}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" color="text.primary">
                       {offer.description}
                     </Typography>
                   </CardContent>
