@@ -17,40 +17,40 @@ export default function NavBar({ onToggleContrast, onCycleFontSize }) {
   }
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" sx={{ bgcolor: 'background.paper' }}>
       <Toolbar>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: 'text.primary', fontWeight: 'bold' }}>
           Serviceportal
         </Typography>
 
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           {auth.isLoggedIn ? (
             <>
-              <Button color="inherit" component={RouterLink} to="/">
+              <Button color="primary" component={RouterLink} to="/">
                 Angebote
               </Button>
-              <Button color="inherit" component={RouterLink} to="/anfrage">
+              <Button color="primary" component={RouterLink} to="/anfrage">
                 Anfrage stellen
               </Button>
               {auth.isAdmin && (
-                <Button color="inherit" component={RouterLink} to="/admin">
+                <Button color="primary" component={RouterLink} to="/admin">
                   Admin
                 </Button>
               )}
-              <Button color="inherit" onClick={auth.logout}>
+              <Button color="primary" onClick={auth.logout}>
                 Logout
               </Button>
             </>
           ) : (
-            <Button color="inherit" component={RouterLink} to="/login">
+            <Button color="primary" component={RouterLink} to="/login">
               Login
             </Button>
           )}
 
-          <Button color="inherit" onClick={onToggleContrast} aria-pressed="false">
+          <Button color="primary" onClick={onToggleContrast} aria-pressed="false">
             Kontrast umschalten
           </Button>
-          <Button color="inherit" onClick={onCycleFontSize}>
+          <Button color="primary" onClick={onCycleFontSize}>
             Schriftgröße ändern
           </Button>
         </Box>

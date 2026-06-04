@@ -18,12 +18,16 @@ export default function SubmitRequestPage() {
 
   useEffect(() => {
     let mounted = true
-    fetch('http://localhost:8080/api/offers')
+    const headers = {}
+    if (auth.credentials) {
+      headers['Authorization'] = 'Basic ' + auth.credentials
+    }
+    fetch('http://localhost:8080/api/offers', { headers })
       .then((r) => r.json())
       .then((d) => mounted && setOffers(d || []))
       .finally(() => mounted && setLoading(false))
     return () => (mounted = false)
-  }, [])
+  }, [auth.credentials])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -54,8 +58,8 @@ export default function SubmitRequestPage() {
   }
 
   return (
-    <Container maxWidth="sm" sx={{ py: 4 }}>
-      <Typography variant="h5" component="h1" gutterBottom>
+    <Container maxWidth="sm" sx={{ py: 4, bgcolor: 'background.default', minHeight: '100vh' }}>
+      <Typography variant="h5" component="h1" gutterBottom sx={{ color: 'text.primary', fontWeight: 'bold' }}>
         Anfrage stellen
       </Typography>
 
@@ -65,7 +69,7 @@ export default function SubmitRequestPage() {
         </Alert>
       )}
 
-      <Box component="form" onSubmit={handleSubmit} noValidate>
+      <Box component="form" onSubmit={handleSubmit} noValidate sx={{ bgcolor: 'background.paper', p: 4, borderRadius: 2 }}>
         <TextField
           label="Nachricht"
           value={message}
@@ -74,7 +78,11 @@ export default function SubmitRequestPage() {
           fullWidth
           multiline
           minRows={3}
-          sx={{ mb: 2 }}
+          sx={{ 
+            mb: 2,
+            '& .MuiInputBase-root': { color: 'text.primary' },
+            '& .MuiInputLabel-root': { color: 'text.secondary' },
+          }}
         />
 
         <TextField
@@ -84,7 +92,11 @@ export default function SubmitRequestPage() {
           onChange={(e) => setServiceOfferId(e.target.value)}
           required
           fullWidth
-          sx={{ mb: 2 }}
+          sx={{ 
+            mb: 2,
+            '& .MuiInputBase-root': { color: 'text.primary' },
+            '& .MuiInputLabel-root': { color: 'text.secondary' },
+          }}
         >
           {loading ? (
             <MenuItem value="">Lade...</MenuItem>
@@ -99,7 +111,7 @@ export default function SubmitRequestPage() {
           )}
         </TextField>
 
-        <Button type="submit" variant="contained">
+        <Button type="submit" variant="contained" color="primary">
           Absenden
         </Button>
       </Box>

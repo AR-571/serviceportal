@@ -6,6 +6,7 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import NavBar from './components/NavBar'
 import LoginPage from './pages/LoginPage'
 import OffersPage from './pages/OffersPage'
+import OfferDetailPage from './pages/OfferDetailPage'
 import SubmitRequestPage from './pages/SubmitRequestPage'
 import AdminDashboard from './pages/AdminDashboard'
 
@@ -43,7 +44,21 @@ function App() {
           text: { primary: '#000000', secondary: '#000000' },
         }
       : {
-          mode: 'light',
+          mode: 'dark',
+          primary: {
+            main: '#7c3aed', // modern purple
+          },
+          secondary: {
+            main: '#06b6d4', // cyan
+          },
+          background: {
+            default: '#0f172a', // dark slate
+            paper: '#1e293b', // lighter slate
+          },
+          text: {
+            primary: '#f1f5f9', // light gray
+            secondary: '#94a3b8', // medium gray
+          },
         }
 
     // high-contrast accent option (yellow on black) for components
@@ -57,7 +72,29 @@ function App() {
             },
           },
         }
-      : {}
+      : {
+          components: {
+            MuiTableCell: {
+              styleOverrides: {
+                root: {
+                  color: '#f1f5f9',
+                },
+                head: {
+                  backgroundColor: '#334155',
+                  color: '#f1f5f9',
+                  fontWeight: 600,
+                },
+              },
+            },
+            MuiPaper: {
+              styleOverrides: {
+                root: {
+                  backgroundColor: '#1e293b',
+                },
+              },
+            },
+          },
+        }
 
     return createTheme({
       palette,
@@ -77,6 +114,7 @@ function App() {
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/" element={<OffersPage />} />
+            <Route path="/angebote/:id" element={<OfferDetailPage />} />
             <Route
               path="/anfrage"
               element={

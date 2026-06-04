@@ -1,10 +1,20 @@
-import React, { createContext, useState } from 'react'
+import React, { createContext, useState, useEffect } from 'react'
 
 export const AuthContext = createContext()
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [credentials, setCredentials] = useState(null)
+
+  // Load credentials from localStorage on mount
+  useEffect(() => {
+    const storedCredentials = localStorage.getItem('authCredentials')
+    const storedUser = localStorage.getItem('authUser')
+    if (storedCredentials && storedUser) {
+      setCredentials(storedCredentials)
+      setUser(JSON.parse(storedUser))
+    }
+  }, [])
 
   const login = async (username, password) => {
     const encoded = btoa(username + ':' + password)
@@ -18,6 +28,8 @@ export function AuthProvider({ children }) {
       const userData = await res.json()
       setUser(userData)
       setCredentials(encoded)
+      localStorage.setItem('authCredentials', encoded)
+      localStorage.setItem('authUser', JSON.stringify(userData))
       return true
     } catch (err) {
       console.error('Login error:', err)
@@ -28,6 +40,8 @@ export function AuthProvider({ children }) {
   const logout = () => {
     setUser(null)
     setCredentials(null)
+    localStorage.removeItem('authCredentials')
+    localStorage.removeItem('authUser')
   }
 
   const value = {

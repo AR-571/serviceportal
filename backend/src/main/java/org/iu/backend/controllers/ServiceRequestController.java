@@ -2,7 +2,10 @@ package org.iu.backend.controllers;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import jakarta.validation.Valid;
+import org.iu.backend.dto.ServiceRequestDTO;
 import org.iu.backend.models.AppUser;
 import org.iu.backend.models.RequestStatus;
 import org.iu.backend.models.ServiceOffer;
@@ -14,7 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,30 +42,14 @@ public class ServiceRequestController {
     }
 
     @GetMapping
-    public List<ServiceRequest> getAll() {
-        return requestRepository.findAll();
-    }
-
-    public static class CreateRequestDTO {
-        public String message;
-        public String status;
-        public Long requesterId;
-        public Long serviceOfferId;
-
-        public CreateRequestDTO() {}
-
-        public String getMessage() { return message; }
-        public void setMessage(String message) { this.message = message; }
-        public String getStatus() { return status; }
-        public void setStatus(String status) { this.status = status; }
-        public Long getRequesterId() { return requesterId; }
-        public void setRequesterId(Long requesterId) { this.requesterId = requesterId; }
-        public Long getServiceOfferId() { return serviceOfferId; }
-        public void setServiceOfferId(Long serviceOfferId) { this.serviceOfferId = serviceOfferId; }
+    public List<ServiceRequestDTO> getAll() {
+        return requestRepository.findAll().stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody CreateRequestDTO dto) {
+    public ResponseEntity<?> create(@Valid @RequestBody ServiceRequestDTO dto) {
         if (dto.getRequesterId() == null || dto.getServiceOfferId() == null) {
             return ResponseEntity.badRequest().body("requesterId and serviceOfferId are required");
         }
@@ -86,6 +75,40 @@ public class ServiceRequestController {
         req.setServiceOffer(offerOpt.get());
 
         ServiceRequest saved = requestRepository.save(req);
-        return new ResponseEntity<>(saved, HttpStatus.CREATED);
+        return new ResponseEntity<>(toDTO(saved), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @Valid @RequestBody ServiceRequestDTO dto) {
+        Optional<ServiceRequest> reqOpt = requestRepository.findById(id);
+        if (reqOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (dto.getStatus() == null) {
+            return ResponseEntity.badRequest().body("status is required");
+        }
+
+        try {
+            RequestStatus newStatus = RequestStatus.valueOf(dto.getStatus());
+            ServiceRequest req = reqOpt.get();
+            req.setStatus(newStatus);
+            ServiceRequest updated = requestRepository.save(req);
+            return ResponseEntity.ok(toDTO(updated));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body("invalid status");
+        }
+    }
+
+    private ServiceRequestDTO toDTO(ServiceRequest req) {
+        return new ServiceRequestDTO(
+                req.getId(),
+                req.getMessage(),
+                req.getStatus().name(),
+                req.getRequester().getId(),
+                req.getRequester().getUsername(),
+                req.getServiceOffer().getId(),
+                req.getServiceOffer().getTitle()
+        );
     }
 }
